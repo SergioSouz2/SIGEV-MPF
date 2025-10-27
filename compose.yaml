@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=SIGEV_MPF'
+      - 'POSTGRES_PASSWORD=SIGEV_MPF_ADMIN'
+      - 'POSTGRES_USER=root'
+    ports:
+      - '5432'
