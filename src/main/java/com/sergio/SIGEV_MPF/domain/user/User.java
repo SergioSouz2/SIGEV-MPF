@@ -10,7 +10,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 
 @Entity
-@Table
+@Table(name = "users")
 @Getter
 @Setter
 @AllArgsConstructor
