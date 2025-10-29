@@ -58,7 +58,7 @@ public class UserController {
             user.setTelefone(userDetails.getTelefone());
             user.setEmail(userDetails.getEmail());
             user.setLogin(userDetails.getLogin());
-            user.setSenha_hash(passwordEncoder.encode(userDetails.getSenha_hash()));
+            user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
             user.setRole(userDetails.getRole());
             user.setUpdated_at(new java.sql.Timestamp(System.currentTimeMillis()));
 

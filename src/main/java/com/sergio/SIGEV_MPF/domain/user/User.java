@@ -30,7 +30,7 @@ public class User {
     private String telefone;
     private String email;
     private String login;
-    private String senha_hash;
+    private String password;
     private String role;
     private Timestamp created_at;
     private Timestamp updated_at;
