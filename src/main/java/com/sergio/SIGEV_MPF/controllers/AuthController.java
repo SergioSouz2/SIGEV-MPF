@@ -1,6 +1,6 @@
 package com.sergio.SIGEV_MPF.controllers;
 
-
+import com.sergio.SIGEV_MPF.domain.user.Role;
 import com.sergio.SIGEV_MPF.domain.user.User;
 import com.sergio.SIGEV_MPF.dto.LoginRequestDTO;
 import com.sergio.SIGEV_MPF.dto.RegisterRequestDTO;
@@ -10,20 +10,9 @@ import com.sergio.SIGEV_MPF.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-
-// http://localhost:8080/auth/login
-// http://localhost:8080/auth/register
-// http://localhost:8080/users #POST
-// http://localhost:8080/users #GET
-// http://localhost:8080/users/{email} #GET
-// http://localhost:8080/users/{id} #DELETE
-
 
 @RestController
 @RequestMapping("/auth")
@@ -34,37 +23,43 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
 
+    // ✅ LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO body) {
-        User user = this.repository.findByEmail(body.email())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Optional<User> userOpt = repository.findByEmail(body.email());
 
-        if (passwordEncoder.matches(body.password(), user.getPassword())) {
-            String token = this.tokenService.generateToken(user);
-            return ResponseEntity.ok(new ResponseDTO(user.getName(), token, user.getRole()));
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("Usuário não encontrado");
         }
 
-        return ResponseEntity.badRequest().build();
+        User user = userOpt.get();
+
+        if (!passwordEncoder.matches(body.password(), user.getPassword())) {
+            return ResponseEntity.status(401).body("Senha incorreta");
+        }
+
+        String token = tokenService.generateToken(user);
+        return ResponseEntity.ok(new ResponseDTO(user.getName(), token, user.getRole().name()));
     }
 
+    // ✅ REGISTER
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequestDTO body) {
-        Optional<User> user = this.repository.findByEmail(body.email());
+        Optional<User> existingUser = repository.findByEmail(body.email());
 
-        if (user.isEmpty()) {
-            User newUser = new User();
-            newUser.setPassword(passwordEncoder.encode(body.password()));
-            newUser.setEmail(body.email());
-            newUser.setName(body.name());
-            newUser.setRole("ADMIN"); // define um role padrão
-
-            this.repository.save(newUser);
-
-            String token = this.tokenService.generateToken(newUser);
-            return ResponseEntity.ok(new ResponseDTO(newUser.getName(), token, newUser.getRole()));
+        if (existingUser.isPresent()) {
+            return ResponseEntity.badRequest().body("Usuário já existe");
         }
 
-        return ResponseEntity.badRequest().build();
-    }
+        User newUser = new User();
+        newUser.setPassword(passwordEncoder.encode(body.password()));
+        newUser.setEmail(body.email());
+        newUser.setName(body.name());
+        newUser.setRole(Role.ADMIN);
 
+        repository.save(newUser);
+
+        String token = tokenService.generateToken(newUser);
+        return ResponseEntity.ok(new ResponseDTO(newUser.getName(), token, newUser.getRole().name()));
+    }
 }
