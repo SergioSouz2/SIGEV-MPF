@@ -17,7 +17,7 @@ public class OpenApiConfig {
                         .version("1.0.0")
                         .description("API de gestão do sistema SIGEV-MPF")
                         .contact(new Contact()
-                                .name("Sérgio")
-                                .email("seuemail@exemplo.com")));
+                                .name("Sérgio Souza")
+                                .email("sergio.tbl0123@gmail.com")));
     }
 }

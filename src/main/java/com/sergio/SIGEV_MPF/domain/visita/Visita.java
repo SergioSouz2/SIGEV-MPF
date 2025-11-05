@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @Entity
 @Table(name = "visitas")
@@ -20,7 +21,7 @@ public class Visita {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id_visita;
+    private UUID id_visita;
 
     @ManyToOne
     @JoinColumn(name = "id_visitante", nullable = false)

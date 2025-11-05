@@ -38,15 +38,25 @@ public class SecurityConfig {
                         // Public auth routes
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+//                        .requestMatchers("/auth/**").permitAll()
 
                         // Admin only
                         .requestMatchers("/user/**").hasRole("ADMIN")
 
                         // Admin & User – visitantes
                         .requestMatchers("/visitante/**").hasAnyRole("ADMIN", "USER")
-
+                        // Admin & User – visita
+                        .requestMatchers("/visita/**").hasAnyRole("ADMIN", "USER")
+                        // 🔓 Libera Swagger e OpenAPI
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         // Everything else needs authentication
                         .anyRequest().authenticated()
+
+
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -77,4 +87,7 @@ public class SecurityConfig {
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+
+
 }
